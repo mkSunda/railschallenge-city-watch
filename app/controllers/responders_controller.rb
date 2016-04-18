@@ -3,7 +3,9 @@ class RespondersController < ApplicationController
     responder = Responder.new(create_params)
     if responder.valid?
       responder.save
-      render :json => responder.as_json, :status => 201
+      response = {responder: responder.attributes.slice("emergency_code",
+                                       "name", "type", "capacity", "on_duty")}
+      render :json => response.as_json, :status => 201
     else
       render :json => {:message => responder.errors.messages}.as_json, :status => 422
     end
