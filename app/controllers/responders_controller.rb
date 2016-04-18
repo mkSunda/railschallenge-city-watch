@@ -1,13 +1,22 @@
 class RespondersController < ApplicationController
-
   def create
-    responder = Responder.create(create_params)
-    render :json => responder.as_json, :status => 201
+    responder = Responder.new(create_params)
+    if responder.valid?
+      responder.save
+      render :json => responder.as_json, :status => 201
+    else
+      render :json => {:message => responder.errors.messages}.as_json, :status => 422
+    end
+  end
+  ActionController::Parameters.action_on_unpermitted_parameters = :raise
+  rescue_from(ActionController::UnpermittedParameters) do |pme|
+    render json: { message:  "#{pme}" },
+               status: 422
   end
 
   private
 
   def create_params
-    params.permit(:type, :name, :capacity)
+    params.require(:responder).permit(:type, :name, :capacity)
   end
 end
